@@ -1,5 +1,6 @@
 import pandas as pd
-from binance import Client
+#from binance.spot import Spot as Client
+from binance.client import Client
 import datetime
 from dateutil.relativedelta import relativedelta
 import matplotlib.pyplot as plt
