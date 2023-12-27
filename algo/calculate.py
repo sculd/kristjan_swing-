@@ -95,10 +95,25 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                     
                     for t in df.index[e:]:
                         last_bar = t
-                        df.loc[t, "portfolio"] = df["portfolio"][e] + df["dollar_open_returns"][t]
-                        df.loc[t, "perc_open_returns"] = df["close"][t] / df["consolidation_high_price"][e] - 1
-                        df.loc[t, "dollar_open_returns"] = df["perc_open_returns"][t] * df["portfolio"][e]
+
+                        def calculate_returns(close_t):
+                            if t < e+5:
+                                df.loc[t, "perc_open_returns"] = (close_t / df["consolidation_high_price"][e] - 1)
+                                df.loc[t, "dollar_open_returns"] = (df["perc_open_returns"][t] * df["portfolio"][e])
+                                df.loc[t, 'transported_gain_loss'] = 0
+                            elif t == e+5:
+                                df.loc[t, "perc_open_returns"] = (close_t / df["consolidation_high_price"][e] - 1)
+                                df.loc[t, "dollar_open_returns"] = (df["perc_open_returns"][t] * df["portfolio"][e])
+                                df.loc[t, 'transported_gain_loss'] = df["dollar_open_returns"][t] / 2
+                            else:
+                                df.loc[t, "perc_open_returns"] = (close_t / df["consolidation_high_price"][e] - 1) / 2
+                                df.loc[t, 'transported_gain_loss'] = df['transported_gain_loss'][t-1]
+                                df.loc[t, "dollar_open_returns"] = (df["perc_open_returns"][t] * df["portfolio"][e]) + df['transported_gain_loss'][t]
+                            df.loc[t, "portfolio"] = df["portfolio"][e] + df["dollar_open_returns"][t]
+
+                        calculate_returns(df["close"][t])
                         
+                        """
                         if t == e+5:
                             df.loc[t, "position_halved"] = True
                             df.loc[t, "perc_open_returns"] = (df["close"][t] / df["consolidation_high_price"][e] - 1)
@@ -111,13 +126,19 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                             df.loc[t, "perc_open_returns"] = (df["close"][t] / df["consolidation_high_price"][e] - 1) / 2
                             df.loc[t, "dollar_open_returns"] = (df["perc_open_returns"][t] * df["portfolio"][e]) + df['transported_gain_loss'][t]
                             df.loc[t, "portfolio"] = df["portfolio"][e] + df["dollar_open_returns"][t]
-                            
+                        """
+                        
                         if df["low"][t] < df.loc[e, "stop_loss"]:
                             consolidation_invalid = True
                             last_bar = t
+                            calculate_returns(df.loc[e, "stop_loss"])
+
+                            """
                             df.loc[t, "perc_open_returns"] = df.loc[e, "stop_loss"] / df["consolidation_high_price"][e] - 1
                             df.loc[t, "dollar_open_returns"] = (df["perc_open_returns"][t] * df["portfolio"][e]) + df['transported_gain_loss'][t]
                             df.loc[t, "portfolio"] = df["portfolio"][e] + df["dollar_open_returns"][t]
+                            """
+                            
                             exit_date = df["date"][t]
                             exit_price = df.loc[e, "stop_loss"]
                             dollar_return = df["dollar_open_returns"][t]
