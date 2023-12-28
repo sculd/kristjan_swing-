@@ -31,6 +31,7 @@ date_str_20230930 = "2023-09-30"
 
 base_okx = 'data/okx'
 df_okx_20231220_1225 = pd.read_parquet(f'{base_okx}/df_okx_20231220_1225.parquet')
+df_okx_20231220_1221 = pd.read_parquet(f'{base_okx}/df_okx_20231220_1221.parquet')
 
 
 def get_close_between_datetime(df, sample_period_minutes, symbols, start_datetime_str, end_datetime_str, if_2023=True):
