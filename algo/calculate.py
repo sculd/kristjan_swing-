@@ -116,7 +116,8 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                         if df["low"][t] < df.loc[e, "stop_loss"]:
                             consolidation_invalid = True
                             last_bar = t
-                            calculate_returns(df.loc[e, "stop_loss"])
+                            # here using df.loc[e, "stop_loss"] seems unrealistic
+                            calculate_returns(df.loc[t, "low"])
                             
                             exit_date = df["date"][t]
                             exit_price = df.loc[e, "stop_loss"]
