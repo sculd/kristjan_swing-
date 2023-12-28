@@ -149,7 +149,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                             open_trade_index = len(open_trades)
                             open_trades.loc[open_trade_index] = [asset, df["date"][e], df["consolidation_low_price"][e], df["close"][e], df["low"][e], df["dollar_open_returns"][t]]
 
-                if df["high"][e] > df["high"][i]:
+                if df["low"][e] < df["low"][i]:
                     counter_low_broken += 1
 
     return df, trades, open_trades

@@ -25,12 +25,14 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
     df['outcome'] = None
     last_bar = 0
 
+    i, l = 0, len(df)
+    #while i < l:
     for i in df.index[last_bar:]:
         if i > 0 and i > last_bar:
             df.loc[i, "portfolio"] = df["portfolio"][i-1]
 
         if i > 90 and i < (len(df)-1) and df["high"][i] > df["high"][i-1] and df["high"][i] > df["high"][i+1] and i >= last_bar:
-            consolidation_invalid = False
+            is_trade_closed = False
             counter_high_broken = 0
 
             df.loc[i, "portfolio"] = df["portfolio"][i-1]
@@ -41,12 +43,15 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
             increase_90_bars = (df["high"][i] / df["high"][i- 90] - 1) * 100
 
             for e in df.index[i+1:]:
+                counter_consolidation_time_maxed = \
+                    counter_consolidation_time >= max_days_in_consolidation
+                    
                 conditional = counter_high_broken == 0 and \
                     df["open"][e] < df["high"][i] and \
                     df['sma_valid'][e] and \
                     (df['high'][i] - df['low'][e]) < df['ATR'][e-1] and \
                     counter_consolidation_time >= min_days_in_consolidation and \
-                    counter_consolidation_time < max_days_in_consolidation and \
+                    not counter_consolidation_time_maxed and \
                     (increase_30_bars > min_perc_increase or increase_60_bars > min_perc_increase or increase_90_bars > min_perc_increase) and \
                     e > last_bar
  
@@ -73,9 +78,12 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                         f"counter_consolidation_time < max_days_in_consolidation: {counter_consolidation_time < max_days_in_consolidation},"
                         f"(increase_30_bars > min_perc_increase or increase_60_bars > min_perc_increase or increase_90_bars > min_perc_increase): {(increase_30_bars > min_perc_increase or increase_60_bars > min_perc_increase or increase_90_bars > min_perc_increase)}")
                 """
-                
-                if consolidation_invalid:
+
+                if is_trade_closed:
                     break
+
+                # no way to recoever these conditions for the same i
+                if counter_consolidation_time_maxed or counter_high_broken > 0: break
 
                 if e > last_bar:
                     df.loc[e, "portfolio"] = df["portfolio"][e-1]
@@ -92,7 +100,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                     df.loc[e, "increase_90_bars"] = increase_90_bars
                     df.loc[e, "counter_consolidation_time"] = counter_consolidation_time
                     df.loc[e, "stop_loss"] = df["low"][e]
-                    
+
                     for t in df.index[e:]:
                         last_bar = t
 
@@ -114,7 +122,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                         calculate_returns(df["close"][t])
                         
                         if df["low"][t] < df.loc[e, "stop_loss"]:
-                            consolidation_invalid = True
+                            is_trade_closed = True
                             last_bar = t
                             # here using df.loc[e, "stop_loss"] seems unrealistic
                             calculate_returns(df.loc[t, "low"])
@@ -139,7 +147,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                             break
 
                         if df["close"][t] < df['SMA_20'][t]:
-                            consolidation_invalid = True
+                            is_trade_closed = True
                             last_bar = t
                             df.loc[t, "portfolio"] = df["portfolio"][e] + df["dollar_open_returns"][t]
                             exit_date = df["date"][t]
@@ -175,5 +183,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
 
                 if df["high"][e] > df["high"][i]:
                     counter_high_broken += 1
+
+        #i = max(i+1, last_bar+1)
 
     return df, trades, open_trades
