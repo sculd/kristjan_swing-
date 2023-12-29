@@ -125,7 +125,7 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                             is_trade_closed = True
                             last_bar = t
                             # here using df.loc[e, "stop_loss"] seems unrealistic
-                            calculate_returns(df.loc[t, "low"])
+                            calculate_returns(df.loc[e, "stop_loss"])
                             
                             exit_date = df["date"][t]
                             exit_price = df.loc[e, "stop_loss"]
