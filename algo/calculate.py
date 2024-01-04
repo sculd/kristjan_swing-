@@ -1,5 +1,6 @@
 import pandas as pd, numpy as np
 import ta
+import publish.telegram
 
 # Initial value of the trading portfolio in dollars
 default_portfolio_value = 100000
@@ -49,6 +50,8 @@ def get_enter_info(asset, df, trading_param):
     for i in df.index[90:-1]:
         if df["high"][i] <= df["high"][i-1] or df["high"][i] <= df["high"][i+1]:
             continue
+
+        publish.telegram.post_message(f'a local high for {asset} was found at {df.iloc[i]}')
 
         counter_high_broken = 0
 
