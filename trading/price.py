@@ -6,6 +6,7 @@ from collections import defaultdict, deque
 import trading.candle
 import pytz
 from threading import Thread
+import trading.price_bq
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(os.getcwd(), 'credential.json')
 
@@ -52,6 +53,11 @@ _msg_cnt = 0
 class PriceCache:
     def __init__(self, trading_manager, windows_minutes):
         self.candle_cache = trading.candle.CandleCache(trading_manager, windows_minutes=windows_minutes)
+        price_bq = trading.price_bq.PriceBq()
+        symbol_serieses = price_bq.fetch_closes(windows_minutes)
+        for symbol, candles in symbol_serieses.items():
+            for candle in candles:
+                self.candle_cache.on_candle(candle[0], symbol, *candle[1:], skip_trading_manager=True)
 
         self.symbols = util.symbols.get_swap_symbobls_usdt()
 

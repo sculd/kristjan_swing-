@@ -23,7 +23,7 @@ trading_manager = trading.trade.TradeManager(trade_execution=trade_execution)
 #trading_manager = trading.trade.TradeManager()
 
 
-price_cache = trading.price.PriceCache(trading_manager, 60)
+price_cache = trading.price.PriceCache(trading_manager, 130)
 
 
 logging.info(f"### starting a new kristijan_swing live at {datetime.datetime.now()}")

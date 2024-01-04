@@ -29,7 +29,7 @@ class CandleCache:
         return df
 
 
-    def on_candle(self, timestamp_epoch_seconds, symbol, open_, high_, low_, close_, volume):
+    def on_candle(self, timestamp_epoch_seconds, symbol, open_, high_, low_, close_, volume, skip_trading_manager=False):
         #print(f'on_candle {timestamp}, {symbol}, {open_}, {high_}, {low_}, {close_}, {volume}')
         def get():
             return (timestamp_epoch_seconds, open_, high_, low_, close_, volume, )
@@ -63,5 +63,6 @@ class CandleCache:
             self.symbol_serieses[symbol].popleft()
 
         if insert_new_minute:
-            self.trading_manager.on_new_minutes(symbol, timestamp_epoch_seconds, self.get_series_df(symbol))
+            if not skip_trading_manager:
+                self.trading_manager.on_new_minutes(symbol, timestamp_epoch_seconds, self.get_series_df(symbol))
             self.symbol_serieses[symbol].append(get())
