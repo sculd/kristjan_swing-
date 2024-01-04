@@ -51,8 +51,6 @@ def get_enter_info(asset, df, trading_param):
         if df["high"][i] <= df["high"][i-1] or df["high"][i] <= df["high"][i+1]:
             continue
 
-        publish.telegram.post_message(f'a local high for {asset} was found at {df.iloc[i]}')
-
         counter_high_broken = 0
 
         counter_consolidation_time = 0
