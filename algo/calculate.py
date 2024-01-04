@@ -36,10 +36,17 @@ class Status:
 
 
 def get_enter_info(asset, df, trading_param):
-    for i in df.index[:-1]:
-        if i <= 90:
-            continue
+    if len(df) < 90:
+        return None
+    
+    df['SMA_10'] = df['close'].rolling(window=10).mean()
+    df['SMA_20'] = df['close'].rolling(window=20).mean()
+    df['SMA_50'] = df['close'].rolling(window=50).mean()
+    df['sma_valid'] = (df['SMA_10'] > df['SMA_20']) & (df['SMA_20'] > df['SMA_50'])
 
+    df['ATR'] = ta.volatility.AverageTrueRange(df['high'], df['low'], df['close']).average_true_range()
+
+    for i in df.index[90:-1]:
         if df["high"][i] <= df["high"][i-1] or df["high"][i] <= df["high"][i+1]:
             continue
 
@@ -50,17 +57,10 @@ def get_enter_info(asset, df, trading_param):
         increase_60_bars = (df["high"][i] / df["high"][i-60] - 1) * 100
         increase_90_bars = (df["high"][i] / df["high"][i-90] - 1) * 100
         
-        df['SMA_10'] = df['close'].rolling(window=10).mean()
-        df['SMA_20'] = df['close'].rolling(window=20).mean()
-        df['SMA_50'] = df['close'].rolling(window=50).mean()
-        df['ATR'] = ta.volatility.AverageTrueRange(df['high'], df['low'], df['close']).average_true_range()
-
         enter_index = 0
         for e in df.index[i+1:]:
             counter_consolidation_time_maxed = \
                 counter_consolidation_time >= trading_param.max_days_in_consolidation
-
-            df['sma_valid'] = (df['SMA_10'] > df['SMA_20']) & (df['SMA_20'] > df['SMA_50'])
 
             conditional = counter_high_broken == 0 and \
                 df["open"][e] < df["high"][i] and \
