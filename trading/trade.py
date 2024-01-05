@@ -28,13 +28,13 @@ class TradeManager:
             enter_info = algo.calculate.get_enter_info(symbol, df, self.trading_param)
             self.status_per_symbol[symbol].update(enter_info)
             if enter_info is not None:
-                logging.info(f'enter_info is found non-None at {epoch_seconds_to_datetime(timestamp_epoch_seconds)} for {symbol}')
+                logging.info(f'enter_info {enter_info} is found non-None at {epoch_seconds_to_datetime(timestamp_epoch_seconds)} for {symbol}')
                 self.trade_execution.execute(symbol, timestamp_epoch_seconds, df.iloc[-1]['close'], 1, 1)
         else:
             exit_info = algo.calculate.get_exit_info(symbol, df, enter_info_before)
             if exit_info is None:
                 return
             
-            logging.info(f'exit_info is found non-None at {epoch_seconds_to_datetime(timestamp_epoch_seconds)}: {exit_info}')
+            logging.info(f'exit_info {exit_info} is found non-None at {epoch_seconds_to_datetime(timestamp_epoch_seconds)}: {exit_info}')
             self.status_per_symbol[symbol].update(None)
             self.trade_execution.execute(symbol, timestamp_epoch_seconds, df.iloc[-1]['close'], 1, -1)
