@@ -30,15 +30,15 @@ class PriceBq:
 
         query = f"""
             WITH LATEST AS (
-            SELECT timestamp, max(ingestion_timestamp) AS max_ingestion_timestamp
+            SELECT symbol, timestamp, max(ingestion_timestamp) AS max_ingestion_timestamp
             FROM `trading-290017.market_data_okx.by_minute` 
             WHERE TRUE
             AND timestamp >= "{t_str_since}"
-            GROUP BY timestamp
+            GROUP BY symbol, timestamp
             )
 
             SELECT *
-            FROM `trading-290017.market_data_okx.by_minute` AS T JOIN LATEST ON T.timestamp = LATEST.timestamp AND T.ingestion_timestamp = LATEST.max_ingestion_timestamp
+            FROM `trading-290017.market_data_okx.by_minute` AS T JOIN LATEST ON T.timestamp = LATEST.timestamp AND T.ingestion_timestamp = LATEST.max_ingestion_timestamp AND T.symbol = LATEST.symbol
             WHERE TRUE
             AND T.timestamp >= "{t_str_since}"
             ORDER BY T.timestamp ASC
