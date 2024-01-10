@@ -31,7 +31,14 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
         if i > 0 and i > last_bar:
             df.loc[i, "portfolio"] = df["portfolio"][i-1]
 
-        if i > 90 and i < (len(df)-1) and df["high"][i] > df["high"][i-1] and df["high"][i] > df["high"][i+1] and i >= last_bar:
+        if i <= 90 or i >= len(df)-1: continue
+
+        #if i < last_bar: continue
+
+        if df['date'][i].strftime('%Y-%m-%d %H:%M:%S') == '2024-01-06 15:25:00':
+            pass # print(f'2024-01-06 15:25:00 found\n{df.loc[i]}')
+
+        if df["high"][i] > df["high"][i-1] and df["high"][i] > df["high"][i+1]:
             is_trade_closed = False
             counter_high_broken = 0
 
@@ -42,10 +49,13 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
             increase_60_bars = (df["high"][i] / df["high"][i- 60] - 1) * 100
             increase_90_bars = (df["high"][i] / df["high"][i- 90] - 1) * 100
 
+            #print(f'highest high found\n{df.loc[i]}')
+
+
             for e in df.index[i+1:]:
                 counter_consolidation_time_maxed = \
                     counter_consolidation_time >= max_days_in_consolidation
-                    
+                
                 conditional = counter_high_broken == 0 and \
                     df["open"][e] < df["high"][i] and \
                     df['sma_valid'][e] and \
@@ -72,6 +82,8 @@ def trade_asset(asset, df, portfolio_value, risk_trade_percentage, min_days_in_c
                     counter_high_broken += 1
 
                 if df["high"][e] > df["high"][i] and conditional:
+                    #print(f"{df['date'][i].strftime('%Y-%m-%d %H:%M:%S')} for\n{df.loc[i]} highest high, entry found\n{df.loc[e]}")
+
                     df.loc[e, "consolidation_high_price"] = df["high"][i]
                     df.loc[e, "consolidation_high_time"] = df["date"][i]
                     df.loc[e, "increase_30_bars"] = increase_30_bars

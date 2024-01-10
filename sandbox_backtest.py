@@ -18,7 +18,8 @@ trading_manager = trading.trade.TradeManager()
 
 #filename = "data/okx/csv_okx_20231127_1128.csv"
 #filename = "data/okx/csv_okx_20231125_1212.csv"
-filename = "data/okx/csv_okx_ICP_20231221_1223.csv"
+#filename = "data/okx/csv_okx_ICP_20231221_1223.csv"
+filename = "data/okx/csv_okx_20231221_1223.csv"
 price_cache = trading.prices_csv.BacktestCsvPriceCache(trading_manager, filename, 130)
 
 

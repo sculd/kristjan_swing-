@@ -30,13 +30,11 @@ date_str_20230930 = "2023-09-30"
 
 
 base_okx = 'data/okx'
-df_okx_20231201_1227 = pd.read_parquet(f'{base_okx}/df_okx_20231201_1227.parquet')
-df_okx_20231220_1225 = pd.read_parquet(f'{base_okx}/df_okx_20231220_1225.parquet')
-df_okx_20231220_1221 = pd.read_parquet(f'{base_okx}/df_okx_20231220_1221.parquet')
-df_okx_20231222_1222 = pd.read_parquet(f'{base_okx}/df_okx_20231222_1222.parquet')
-df_okx_20231223_1223 = pd.read_parquet(f'{base_okx}/df_okx_20231223_1223.parquet')
-df_okx_20231201_1205 = pd.read_parquet(f'{base_okx}/df_okx_20231201_1205.parquet')
-df_okx_20231205_1210 = pd.read_parquet(f'{base_okx}/df_okx_20231205_1210.parquet')
+df_okx_20240106_0109 = pd.read_parquet(f'{base_okx}/df_okx_20240106_0109.parquet')
+df_okx_20240101_0109 = pd.read_parquet(f'{base_okx}/df_okx_20240101_0109.parquet')
+df_okx_20231216_1231 = pd.read_parquet(f'{base_okx}/df_okx_20231216_1231.parquet')
+df_okx_20240106_0107 = pd.read_parquet(f'{base_okx}/df_okx_20240106_0107.parquet')
+df_okx_20240107_0108 = pd.read_parquet(f'{base_okx}/df_okx_20240107_0108.parquet')
 
 
 def get_close_between_datetime(df, sample_period_minutes, symbols, start_datetime_str, end_datetime_str, if_2023=True):
